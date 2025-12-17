@@ -1,0 +1,170 @@
+/* --- Import Google Font --- */
+@import url('https://fonts.googleapis.com/css?family=Oswald:400,700');
+
+/* --- Define Brand Colors --- */
+:root {
+  --digin-blue: #003366;
+  --digin-orange: #F58025;
+  
+  /* Override Bootstrap primary color */
+  --bs-primary: var(--digin-orange);
+  --bs-primary-rgb: 245, 128, 37; 
+  
+  /* Override Bootstrap link color */
+  --bs-link-color: var(--digin-orange);
+  --bs-link-hover-color: #d97021; /* Darker orange */
+}
+
+/* --- Fonts --- */
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Headings (and app title) use Oswald and blue */
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, .page-title {
+  font-family: 'Oswald', sans-serif;
+  color: var(--digin-blue);
+}
+
+/* --- Layout --- */
+
+
+
+/* Style the sidebar with the dark blue */
+.bslib-sidebar-layout > .sidebar {
+  background-color: var(--digin-blue);
+  color: #ffffff; /* Make all default text white */
+}
+
+.sidebar-content .conference_filter {
+  word-wrap: break-word; /* Allows long words to break and wrap */
+}
+
+/* Sidebar headings and text */
+.sidebar h4, .sidebar .h4, .sidebar .control-label {
+  color: #ffffff; /* White counter text & labels */
+}
+
+/* Make accordion buttons in sidebar match */
+.sidebar .accordion-button {
+  background-color: #004a99; /* A slightly lighter blue */
+  color: #ffffff;
+  font-family: 'Oswald', sans-serif;
+}
+
+/* Style the *open* accordion button with orange */
+.sidebar .accordion-button:not(.collapsed) {
+  background-color: var(--digin-orange);
+  color: #ffffff;
+}
+
+/* Fix icon color on open button */
+.sidebar .accordion-button:not(.collapsed)::after {
+    background-image: var(--bs-accordion-btn-icon);
+}
+
+/* Make sidebar accordion content match */
+.sidebar .accordion-body {
+  background-color: var(--digin-blue);
+}
+
+
+/* --- NEW: Tab & Sidebar Font Fixes --- */
+
+/* 1. Make tab labels use the Oswald font */
+.nav-tabs .nav-link {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* 2. Force sidebar "list" (checkbox) labels to be white */
+/* This is more general to catch all checkbox groups */
+.sidebar .shiny-options-group label {
+  color: #ffffff;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* 3. NEW: Force sliderTextInput grid labels to be light grey */
+.sidebar .irs-grid-text {
+  color: #cccccc;
+}
+
+/* 4. NEW: Style the conference picker button */
+.sidebar .bootstrap-select .btn {
+  background-color: #004a99; /* Lighter blue */
+  color: #ffffff;
+  border-color: #004a99;
+}
+
+
+/* --- Components --- */
+
+/* Make active tabs use the orange */
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+  color: var(--digin-orange);
+  border-bottom: 2px solid var(--digin-orange);
+}
+
+/* Make action buttons use the orange */
+.btn-primary {
+    background-color: var(--digin-orange);
+    border-color: var(--digin-orange);
+}
+.btn-primary:hover {
+    background-color: #d97021;
+    border-color: #d97021;
+}
+
+/* Style the sliders to be orange */
+.irs--shiny .irs-bar,
+.irs--shiny .irs-from,
+.irs--shiny .irs-to,
+.irs--shiny .irs-single {
+  background-color: var(--digin-orange);
+}
+.irs--shiny .irs-handle > i:first-child {
+    border-top-color: var(--digin-orange);
+}
+
+
+/* --- MODIFIED: Roster Card Styling --- */
+
+/* Add background, border, and shadow to cards */
+.roster-card {
+  background-color: #f8f9fa; /* Light grey background */
+  border: 1px solid #e0e0e0; /* Light grey border */
+  border-top: 5px solid var(--digin-blue); /* Stronger blue top accent */
+  border-radius: 8px; /* Softer corners */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Subtle shadow */
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: box-shadow 0.3s ease;
+}
+
+.roster-card:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1); /* Deeper shadow on hover */
+}
+
+/* School Name */
+.roster-card h4 {
+    font-family: 'Oswald', sans-serif;
+    color: var(--digin-blue);
+    margin-bottom: 0.25rem;
+}
+
+/* Record: h5 that immediately follows h4 */
+.roster-card h4 + h5 {
+    font-family: 'Oswald', sans-serif;
+    color: var(--digin-orange); /* Keep the record orange */
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+}
+
+/* "Roster Details" h5 (and any other h5s) */
+.roster-card h5:not(h4 + h5) {
+    font-family: 'Oswald', sans-serif;
+    color: var(--digin-blue); /* Make "Roster Details" blue */
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}

@@ -1,0 +1,288 @@
+/* --- Import Google Font --- */
+@import url('https://fonts.googleapis.com/css?family=Oswald:400,700');
+
+/* --- Define Brand Colors --- */
+:root {
+  --digin-blue: #003366;
+  --digin-orange: #F58025;
+  
+  /* Override Bootstrap primary color */
+  --bs-primary: var(--digin-orange);
+  --bs-primary-rgb: 245, 128, 37; 
+  
+  /* Override Bootstrap link color */
+  --bs-link-color: var(--digin-orange);
+  --bs-link-hover-color: #d97021; /* Darker orange */
+}
+
+/* --- Fonts --- */
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Headings (and app title) use Oswald and blue */
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Oswald', sans-serif;
+  color: var(--digin-blue);
+}
+
+/* --- Sidebar Styling --- */
+
+/* Dash sidebar container */
+.sidebar {
+  background-color: var(--digin-blue) !important;
+  color: #ffffff !important;
+  padding: 20px;
+}
+
+/* Sidebar headings and labels */
+.sidebar h4, 
+.sidebar h5,
+.sidebar label {
+  color: #ffffff !important;
+  font-family: 'Oswald', sans-serif;
+}
+
+/* Accordion styling for filter panels */
+.accordion-button {
+  background-color: #004a99 !important; /* Lighter blue */
+  color: #ffffff !important;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+}
+
+/* Active/open accordion button - orange highlight */
+.accordion-button:not(.collapsed) {
+  background-color: var(--digin-orange) !important;
+  color: #ffffff !important;
+}
+
+/* Accordion body (filter content area) */
+.accordion-body {
+  background-color: var(--digin-blue);
+  color: #ffffff;
+}
+
+/* Form labels inside accordion */
+.accordion-body label {
+  color: #ffffff !important;
+}
+
+/* --- Buttons --- */
+.btn-primary {
+  background-color: var(--digin-orange) !important;
+  border-color: var(--digin-orange) !important;
+}
+
+.btn-primary:hover {
+  background-color: #d97021 !important;
+  border-color: #d97021 !important;
+}
+
+.btn-secondary {
+  background-color: var(--digin-blue) !important;
+  border-color: var(--digin-blue) !important;
+}
+
+/* --- Tabs --- */
+.nav-tabs .nav-link {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--digin-blue);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--digin-orange) !important;
+  border-bottom: 2px solid var(--digin-orange);
+}
+
+/* --- Cards --- */
+.card {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-top: 5px solid var(--digin-blue);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.card h4 {
+  font-family: 'Oswald', sans-serif;
+  color: var(--digin-blue);
+  margin-bottom: 0.5rem;
+}
+
+/* Record subtitle in orange */
+.card h5:first-of-type {
+  color: var(--digin-orange);
+  font-family: 'Oswald', sans-serif;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* --- Badges --- */
+.badge {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.badge.bg-primary {
+  background-color: var(--digin-orange) !important;
+}
+
+.badge.bg-secondary {
+  background-color: var(--digin-blue) !important;
+}
+
+/* --- Table Styling --- */
+.dash-table-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.dash-spreadsheet {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.dash-spreadsheet-container .dash-spreadsheet-inner table {
+  border-collapse: collapse;
+}
+
+/* Table header */
+.dash-header {
+  background-color: var(--digin-blue) !important;
+  color: #ffffff !important;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+}
+
+/* Selected row highlight */
+.dash-spreadsheet .dash-spreadsheet-container .dash-spreadsheet-inner table .cell--selected {
+  background-color: rgba(245, 128, 37, 0.2) !important;
+}
+
+/* --- Sliders --- */
+.rc-slider-track {
+  background-color: var(--digin-orange) !important;
+}
+
+.rc-slider-handle {
+  border-color: var(--digin-orange) !important;
+}
+
+.rc-slider-handle:hover,
+.rc-slider-handle:active {
+  border-color: #d97021 !important;
+  box-shadow: 0 0 5px var(--digin-orange) !important;
+}
+
+/* --- Dropdown Styling --- */
+.Select-control {
+  border-color: #ced4da !important;
+}
+
+.Select-menu-outer {
+  border-color: #ced4da !important;
+}
+
+.Select--multi .Select-value {
+  background-color: var(--digin-orange) !important;
+  border-color: var(--digin-orange) !important;
+  color: #ffffff !important;
+}
+
+/* --- Input Fields --- */
+input[type="text"],
+input[type="number"],
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+.form-control:focus {
+  border-color: var(--digin-orange);
+  box-shadow: 0 0 0 0.2rem rgba(245, 128, 37, 0.25);
+}
+
+/* --- Links --- */
+a {
+  color: var(--digin-orange);
+  text-decoration: none;
+}
+
+a:hover {
+  color: #d97021;
+  text-decoration: underline;
+}
+
+/* --- Checklist Styling --- */
+.form-check-input:checked {
+  background-color: var(--digin-orange) !important;
+  border-color: var(--digin-orange) !important;
+}
+
+/* --- School Counter --- */
+.school-counter {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.2rem;
+  color: #ffffff;
+  background-color: var(--digin-blue);
+  padding: 10px 15px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.school-counter .count-number {
+  color: var(--digin-orange);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+/* --- Modal Styling --- */
+.modal-header {
+  background-color: var(--digin-blue);
+  color: #ffffff;
+}
+
+.modal-title {
+  font-family: 'Oswald', sans-serif;
+  color: #ffffff !important;
+}
+
+.modal-header .btn-close {
+  filter: invert(1);
+}
+
+/* --- Map Container --- */
+.map-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .sidebar {
+    padding: 15px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  .nav-tabs .nav-link {
+    font-size: 1rem;
+  }
+}
