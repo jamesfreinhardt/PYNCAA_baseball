@@ -16,6 +16,13 @@ import requests
 import os
 from dotenv import load_dotenv
 
+# Firebase imports
+from auth_components import (
+    create_login_modal, create_user_menu, create_saved_schools_modal,
+    create_analytics_modal, create_session_stores
+)
+from auth_callbacks import register_auth_callbacks
+
 # Load environment variables
 load_dotenv()
 
@@ -824,6 +831,11 @@ MONTH_OPTIONS = [
 
 # Sidebar filters
 sidebar = dbc.Col([
+    # User authentication menu
+    html.Div([
+        html.Div(id='user-menu-container', children=create_user_menu(), className='mb-3')
+    ]),
+    
     html.H4(id='school-counter', className='mb-3 school-counter'),
     html.Hr(),
     
@@ -1131,6 +1143,10 @@ main_content = dbc.Col([
 # App layout
 print("Creating layout...")
 app.layout = dbc.Container([
+    # Session stores for Firebase authentication
+    create_session_stores(),
+    dcc.Store(id='search-tracker', data={}),  # Track user searches
+    
     dcc.Store(id='saved-schools', data=[]),
     dcc.Store(id='home-location', data=None),
     dcc.Store(id='filter-state', data={}),  # Store for all filter values
@@ -1161,6 +1177,11 @@ app.layout = dbc.Container([
             dbc.Button("Close", id="close-team-metrics-modal", className="ms-auto", n_clicks=0)
         )
     ], id='team-metrics-modal', size='xl', is_open=False),
+    
+    # Firebase authentication modals
+    create_login_modal(),
+    create_saved_schools_modal(),
+    create_analytics_modal(),
     
     dbc.Row([sidebar, main_content])
 ], fluid=True, style={'padding': '0'})
@@ -2468,6 +2489,13 @@ def toggle_team_metrics_modal(open_clicks, close_clicks, is_open, unitid):
             return False, html.Div(f"Error loading team metrics: {str(e)}")
     
     return is_open, ""
+
+# ============================================================================
+# FIREBASE AUTHENTICATION CALLBACKS
+# ============================================================================
+
+# Register all Firebase authentication callbacks
+register_auth_callbacks(app)
 
 # ============================================================================
 # RUN SERVER

@@ -18,3 +18,7 @@ plotly>=5.18.0
 
 # Optional: for better performance
 dash-extensions>=1.0.0
+
+# Firebase Authentication & Database
+pyrebase4>=4.8.0
+firebase-admin>=7.0.0

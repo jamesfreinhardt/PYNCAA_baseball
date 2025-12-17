@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 .env
+# Firebase service account key
+firebase-service-account.json
