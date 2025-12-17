@@ -4,8 +4,7 @@
 This app now includes Firebase authentication and Firestore database integration for user management and metrics tracking.
 
 ## Firebase Configuration Already Done ✅
-The Firebase web configuration has been added to `firebase_config.py`:
-- API Key: AIzaSyDD6l5a3hFFcWpmI3M2_rzUIHiUB8XR_60
+The Firebase web configuration has been added to `firebase_config._60
 - Project: ncaabaseball-ebe8b
 - Authentication and Firestore are configured
 
