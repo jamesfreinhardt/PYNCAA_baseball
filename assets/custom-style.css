@@ -299,45 +299,17 @@ a:hover {
     position: relative;
   }
   
-  /* Map container */
+  /* Map container and height */
   .map-container {
     margin: 0 -15px; /* Full width on mobile */
     border-radius: 0;
   }
   
-  /* Typography */
-  h1 {
-    font-size: 1.75rem;
-  }
-  
-  .nav-tabs .nav-link {
-    font-size: 0.95rem;
-    padding: 0.5rem 0.75rem;
-  }
-  
-  /* Cards */
-  .card {
-    margin-bottom: 1rem;
-    padding: 1rem;
-  }
-  
-  /* Tables */
-  .dash-table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Map */
   #baseball-map {
     height: 50vh !important;
   }
   
-  .map-container {
-    margin: 0 -15px; /* Full width on mobile */
-    border-radius: 0;
-  }
-  
-  /* Buttons */
+  /* Typography */
   .btn-group {
     flex-direction: column;
   }
@@ -481,9 +453,10 @@ a:hover {
   }
 }
 
-/* Landscape orientation adjustments (applies in addition to general tablet styles above) */
+/* Landscape orientation adjustments */
+/* In landscape mode on tablets/phones, users have less vertical space,
+   so we increase the map height from 50vh to 60vh to better utilize the horizontal space */
 @media (max-width: 768px) and (orientation: landscape) {
-  /* Adjust map height specifically for landscape - overrides the 50vh from general tablet styles */
   #baseball-map {
     height: 60vh !important;
   }
