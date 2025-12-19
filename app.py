@@ -2662,4 +2662,5 @@ register_auth_callbacks(app)
 # ============================================================================
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8050, use_reloader=False)
+    port = int(os.getenv('PORT', 8080))
+    app.run(debug=False, host='0.0.0.0', port=port, use_reloader=False)
