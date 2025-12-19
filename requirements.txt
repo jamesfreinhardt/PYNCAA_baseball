@@ -25,3 +25,6 @@ firebase-admin>=7.0.0
 
 # Production server
 gunicorn>=21.2.0
+
+# AI/ML for recommendations and email generation
+openai>=1.12.0
