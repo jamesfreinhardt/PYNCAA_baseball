@@ -41,6 +41,9 @@ app = dash.Dash(
     suppress_callback_exceptions=True
 )
 
+# Expose Flask server for Gunicorn
+server = app.server
+
 # ============================================================================
 # DATA LOADING
 # ============================================================================

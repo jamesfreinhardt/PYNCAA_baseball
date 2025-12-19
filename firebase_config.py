@@ -27,20 +27,28 @@ firebase = pyrebase.initialize_app(firebase_web_config)
 auth_client = firebase.auth()
 
 # Initialize Firebase Admin SDK (for server-side operations)
-# Note: You'll need to download your service account key from Firebase Console
-# and save it as 'firebase-service-account.json' in the project directory
+# Prefer Application Default Credentials (ADC) on GCP; fallback to local JSON in development
 try:
     if not firebase_admin._apps:
-        # Try to load service account credentials
+        cred = None
         service_account_path = 'firebase-service-account.json'
+
         if os.path.exists(service_account_path):
             cred = credentials.Certificate(service_account_path)
+            print("Using local Firebase service account JSON")
+        else:
+            try:
+                cred = credentials.ApplicationDefault()
+                print("Using Application Default Credentials (GCP)")
+            except Exception as _:
+                cred = None
+
+        if cred:
             firebase_admin.initialize_app(cred)
             db = firestore.client()
-            print("Firebase Admin initialized with service account")
+            print("Firebase Admin initialized")
         else:
-            # Don't try default credentials - just skip admin features
-            print("Warning: firebase-service-account.json not found. Admin features disabled.")
+            print("Warning: No Firebase Admin credentials available. Admin features disabled.")
             db = None
 except Exception as e:
     print(f"Warning: Firebase Admin initialization failed: {e}")

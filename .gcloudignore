@@ -18,3 +18,13 @@ firebase.json
 
 # Ignore node modules (if any)
 node_modules/
+ 
+ # Additional ignores for App Engine deploy
+ .gitignore
+ .vscode/
+ *.ipynb_checkpoints/
+ build/
+ dist/
+ firebase-service-account.json
+ *.pyo
+ *.pyd
