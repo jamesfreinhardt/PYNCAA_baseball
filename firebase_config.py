@@ -39,10 +39,9 @@ try:
             db = firestore.client()
             print("Firebase Admin initialized with service account")
         else:
-            # Initialize with default credentials (for development)
-            firebase_admin.initialize_app()
-            db = firestore.client()
-            print("Firebase Admin initialized with default credentials")
+            # Don't try default credentials - just skip admin features
+            print("Warning: firebase-service-account.json not found. Admin features disabled.")
+            db = None
 except Exception as e:
     print(f"Warning: Firebase Admin initialization failed: {e}")
     db = None

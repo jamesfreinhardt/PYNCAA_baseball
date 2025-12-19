@@ -1534,7 +1534,7 @@ def update_filtered_table(filter_state, search_text):
         
         table_data = filtered[display_cols].copy()
         
-        # Create DataTable with row selection
+        # Create DataTable with row selection and sorting
         return dash_table.DataTable(
             id='filtered-datatable',
             columns=[
@@ -1550,6 +1550,7 @@ def update_filtered_table(filter_state, search_text):
             data=table_data.to_dict('records'),
             row_selectable='multi',
             selected_rows=[],
+            sort_action='native',
             style_table={'overflowX': 'auto', 'overflowY': 'auto', 'maxHeight': '600px'},
             style_cell={'textAlign': 'left', 'padding': '5px'},
             style_header={'backgroundColor': 'rgb(230, 230, 230)', 'fontWeight': 'bold'},
@@ -1627,6 +1628,7 @@ def update_saved_table(saved_unitids):
             data=table_data.to_dict('records'),
             row_selectable='multi',
             selected_rows=[],
+            sort_action='native',
             page_size=20,
             style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'left', 'padding': '5px'},

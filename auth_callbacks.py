@@ -8,6 +8,7 @@ from dash.exceptions import PreventUpdate
 import json
 from firebase_config import FirebaseAuth, UserMetrics
 from auth_components import create_user_menu
+from school_classification import SchoolClassifier
 import dash_bootstrap_components as dbc
 from dash import html
 
@@ -277,3 +278,125 @@ def register_auth_callbacks(app):
             }
             UserMetrics.track_search(user_id, search_params)
         raise PreventUpdate
+    
+    
+    # ========================================================================
+    # SCHOOL CLASSIFICATION CALLBACKS
+    # ========================================================================
+    
+    # Handle classification button clicks
+    @app.callback(
+        Output({'type': 'classification-feedback', 'index': ALL}, 'children'),
+        Input({'type': 'classify-btn', 'index': ALL}, 'n_clicks'),
+        [State('user-session', 'data'),
+         State({'type': 'classify-btn', 'index': ALL}, 'id'),
+         State('current-school-data', 'data')],
+        prevent_initial_call=True
+    )
+    def handle_classification(n_clicks, session_data, button_ids, school_data):
+        if not any(n_clicks):
+            raise PreventUpdate
+        
+        if not session_data:
+            return [dbc.Alert("Please sign in to classify schools", color="warning", className="mt-2")]
+        
+        # Find which button was clicked
+        clicked_index = next((i for i, clicks in enumerate(n_clicks) if clicks), None)
+        if clicked_index is None or not school_data:
+            raise PreventUpdate
+        
+        # Extract classification from button ID
+        button_id = button_ids[clicked_index]['index']
+        classification_type = button_id.split('_')[-1].capitalize()
+        
+        user_id = session_data.get('user_id')
+        
+        # Save classification
+        result = SchoolClassifier.save_classification(
+            user_id=user_id,
+            school_data=school_data,
+            classification=classification_type,
+            auto_suggested=False
+        )
+        
+        # Prepare feedback
+        feedbacks = [html.Span() for _ in button_ids]
+        
+        if result.get('success'):
+            fit_score = result['data']['classification_scores']['overall_score']
+            feedbacks[clicked_index] = dbc.Alert([
+                html.I(className="fas fa-check-circle me-2"),
+                f"Classified as {classification_type} (Fit Score: {fit_score}%)"
+            ], color="success", className="mt-2", dismissable=True)
+        else:
+            feedbacks[clicked_index] = dbc.Alert([
+                html.I(className="fas fa-exclamation-triangle me-2"),
+                f"Error: {result.get('error', 'Unknown error')}"
+            ], color="danger", className="mt-2", dismissable=True)
+        
+        return feedbacks
+    
+    
+    # Show My Schools modal
+    @app.callback(
+        [Output('my-schools-modal', 'is_open'),
+         Output('target-schools-list', 'children'),
+         Output('reach-schools-list', 'children'),
+         Output('safety-schools-list', 'children'),
+         Output('all-classified-schools-list', 'children')],
+        [Input('view-my-schools', 'n_clicks'),
+         Input('close-my-schools', 'n_clicks')],
+        [State('user-session', 'data'),
+         State('my-schools-modal', 'is_open')],
+        prevent_initial_call=True
+    )
+    def toggle_my_schools(view_clicks, close_clicks, session_data, is_open):
+        if ctx.triggered_id == 'view-my-schools':
+            if not session_data:
+                return False, [], [], [], []
+            
+            user_id = session_data.get('user_id')
+            result = SchoolClassifier.get_all_classifications(user_id)
+            
+            if not result['success']:
+                return True, [html.P("Error loading schools", className="text-danger")], [], [], []
+            
+            classifications = result['classifications']
+            
+            if not classifications:
+                empty_msg = html.P("No schools classified yet. Start exploring and classify schools!", className="text-muted")
+                return True, empty_msg, empty_msg, empty_msg, empty_msg
+            
+            # Sort by classification
+            target_schools = [c for c in classifications if c.get('classification') == 'Target']
+            reach_schools = [c for c in classifications if c.get('classification') == 'Reach']
+            safety_schools = [c for c in classifications if c.get('classification') == 'Safety']
+            
+            def create_school_card(school):
+                scores = school.get('classification_scores', {})
+                return dbc.Card([
+                    dbc.CardBody([
+                        html.H5(school.get('school_name', 'Unknown School')),
+                        dbc.Badge(
+                            f"{scores.get('overall_score', 0)}% Overall Fit",
+                            color="info",
+                            className="mb-2"
+                        ),
+                        html.P([
+                            html.Small(f"Athletic: {scores.get('athletic_score', 0)}% | "),
+                            html.Small(f"Academic: {scores.get('academic_score', 0)}%")
+                        ], className="text-muted mb-2"),
+                        html.P(school.get('notes', ''), className="small") if school.get('notes') else None,
+                        html.Small(f"Classified: {school.get('classified_date', 'N/A')}", className="text-muted")
+                    ])
+                ], className="mb-2")
+            
+            target_list = [create_school_card(s) for s in target_schools] if target_schools else [html.P("No target schools yet", className="text-muted")]
+            reach_list = [create_school_card(s) for s in reach_schools] if reach_schools else [html.P("No reach schools yet", className="text-muted")]
+            safety_list = [create_school_card(s) for s in safety_schools] if safety_schools else [html.P("No safety schools yet", className="text-muted")]
+            all_list = [create_school_card(s) for s in classifications]
+            
+            return True, target_list, reach_list, safety_list, all_list
+        
+        return False, [], [], [], []
+
