@@ -1573,9 +1573,22 @@ def handle_map_click(clickData, saved_schools, click_state):
                 enroll_txt = fmt_int(school_data.get('ugds'))
                 city = school_data.get('city', 'N/A')
                 state = school_data.get('state_abbr', '')
+                
+                # Get school logo
+                ncaa_name = school_data.get('NCAA_Name.x')
+                logo_url = get_school_logo_url(school_data.get('inst_name', 'Unknown'), ncaa_name)
 
                 info_card = dbc.Card([
-                    dbc.CardHeader(html.H5(school_data.get('inst_name', 'Unknown'), className='mb-0')),
+                    dbc.CardHeader(
+                        dbc.Row([
+                            dbc.Col([
+                                html.Img(src=logo_url, style={'height': '40px', 'marginRight': '10px'})
+                            ], width='auto', className='d-flex align-items-center'),
+                            dbc.Col([
+                                html.H5(school_data.get('inst_name', 'Unknown'), className='mb-0')
+                            ], className='d-flex align-items-center')
+                        ], className='align-items-center')
+                    ),
                     dbc.CardBody([
                         dbc.Row([
                             dbc.Col([
@@ -1615,7 +1628,7 @@ def handle_map_click(clickData, saved_schools, click_state):
                             n_clicks=0,
                             className='me-2'
                         ),
-                        html.Small('Single-click to view, button to save', className='text-muted')
+                        html.Small('', className='text-muted')
                     ])
                 ], className='border-primary')
             else:
