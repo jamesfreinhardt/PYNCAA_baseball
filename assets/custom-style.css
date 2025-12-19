@@ -273,16 +273,193 @@ a:hover {
 }
 
 /* --- Responsive Adjustments --- */
+
+/* Tablet and below (768px) - Consolidated media query */
 @media (max-width: 768px) {
+  /* Sidebar adjustments */
   .sidebar {
     padding: 15px;
+    height: auto !important;
+    min-height: auto;
+    max-height: none;
+    position: relative;
   }
   
-  h1 {
-    font-size: 1.75rem;
+  /* Map container and height */
+  .map-container {
+    margin: 0 -15px; /* Full width on mobile */
+    border-radius: 0;
   }
   
-  .nav-tabs .nav-link {
+  /* Map height - !important required to override Dash/Plotly inline styles */
+  #baseball-map {
+    height: 50vh !important;
+  }
+  
+  /* Typography */
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .btn, button {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+  }
+  
+  /* Accordion */
+  .accordion-button {
+    padding: 0.75rem;
     font-size: 1rem;
   }
+  
+  /* Form controls */
+  input[type="text"],
+  input[type="number"],
+  .form-control {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+  
+  /* Slider labels */
+  .rc-slider-mark-text {
+    font-size: 0.75rem;
+  }
+  
+  /* School counter */
+  .school-counter {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+  
+  .school-counter .count-number {
+    font-size: 1.2rem;
+  }
+  
+  /* Checkboxes - larger touch targets */
+  .form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+  
+  .form-check-label {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  /* Scrolling */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  body, html {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
 }
+
+/* Mobile devices (576px and below) */
+@media (max-width: 576px) {
+  /* Further reduce heading sizes */
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2, .h2 {
+    font-size: 1.3rem;
+  }
+  
+  h3, .h3 {
+    font-size: 1.15rem;
+  }
+  
+  h4, .h4 {
+    font-size: 1rem;
+  }
+  
+  /* Compact navigation tabs */
+  .nav-tabs .nav-link {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem;
+  }
+  
+  /* Reduce map height further - !important required to override Dash inline styles */
+  #baseball-map {
+    height: 40vh !important;
+  }
+  
+  /* Compact sidebar */
+  .sidebar {
+    padding: 10px;
+  }
+  
+  /* Smaller badges */
+  .badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  
+  /* Compact cards */
+  .card {
+    padding: 0.75rem;
+  }
+  
+  .card h4 {
+    font-size: 1rem;
+  }
+  
+  .card h5 {
+    font-size: 0.9rem;
+  }
+  
+  /* Better modal sizing */
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  /* Improve table on small screens */
+  .dash-spreadsheet {
+    font-size: 0.85rem;
+  }
+  
+  /* Compact accordion */
+  .accordion-button {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .accordion-body {
+    padding: 0.75rem;
+  }
+  
+  /* Smaller slider marks */
+  .rc-slider-mark-text {
+    font-size: 0.7rem;
+  }
+  
+  /* Optimize dropdown for mobile */
+  .Select-menu-outer {
+    max-height: 200px;
+  }
+}
+
+/* Landscape orientation adjustments */
+/* In landscape mode on tablets (but not small phones), increase map height
+   from 50vh to 60vh to better utilize the horizontal space.
+   Phones in landscape (≤576px) will keep the 40vh from the mobile query.
+   !important required to override Dash/Plotly inline styles */
+@media (min-width: 577px) and (max-width: 768px) and (orientation: landscape) {
+  #baseball-map {
+    height: 60vh !important;
+  }
+}
+

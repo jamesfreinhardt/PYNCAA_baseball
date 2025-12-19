@@ -1,3 +1,10 @@
 .env
 # Firebase service account key
 firebase-service-account.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
