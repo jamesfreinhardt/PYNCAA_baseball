@@ -24,6 +24,13 @@ from auth_components import (
 )
 from auth_callbacks import register_auth_callbacks
 
+# AI feature imports
+from ai_components import (
+    create_ai_recommendations_tab, create_email_generator_modal,
+    create_ai_feature_notice
+)
+from ai_recommendations import SchoolRecommendationEngine, EmailGenerator
+
 # Load environment variables
 load_dotenv()
 
@@ -73,6 +80,19 @@ merged_data['win_pct'] = np.where(
 )
 merged_data['accept_rate_pct'] = (merged_data['adm_rate'] * 100).round(1)
 merged_data['sat_score'] = merged_data['sat_avg'].fillna(0)
+
+# ============================================================================
+# AI FEATURE INITIALIZATION
+# ============================================================================
+
+# Initialize AI engines
+recommendation_engine = SchoolRecommendationEngine()
+email_generator = EmailGenerator()
+
+# Check if AI features are available
+ai_features_available = recommendation_engine.is_available() and email_generator.is_available()
+if not ai_features_available:
+    print("Warning: OpenAI API key not configured. AI features will be disabled.")
 
 # ============================================================================
 # ROSTER METRICS HELPER FUNCTIONS
@@ -1141,6 +1161,11 @@ main_tabs = dbc.Tabs([
         html.Div(id='roster-metrics')
     ], label='Metrics', tab_id='tab-metrics'),
 
+    # AI Recommendations Tab
+    dbc.Tab([
+        create_ai_recommendations_tab()
+    ], label=[html.I(className='fas fa-magic me-2'), 'AI Recommendations'], tab_id='tab-ai-recommendations'),
+
     # Profile Tab
     dbc.Tab([
         html.Div(id='profile-page', className='p-3')
@@ -1195,6 +1220,9 @@ app.layout = dbc.Container([
     create_login_modal(),
     create_saved_schools_modal(),
     create_analytics_modal(),
+    
+    # AI feature modals
+    create_email_generator_modal(),
     
     dbc.Row([sidebar, main_content])
 ], fluid=True, style={'padding': '0'})
@@ -1926,13 +1954,27 @@ def update_roster_metrics(saved_unitids):
                     ]),
                     html.Hr(),
                     
-                    dbc.Button(
-                        "View School Metrics",
-                        id={'type': 'view-metrics-btn', 'index': school['unitid']},
-                        color="primary",
-                        size="sm",
-                        className="w-100"
-                    )
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.Button(
+                                "View School Metrics",
+                                id={'type': 'view-metrics-btn', 'index': school['unitid']},
+                                color="primary",
+                                size="sm",
+                                className="w-100 mb-2"
+                            )
+                        ], width=12),
+                        dbc.Col([
+                            dbc.Button(
+                                [html.I(className="fas fa-envelope me-2"), "Draft Email to Coach"],
+                                id={'type': 'draft-email-btn', 'index': school['unitid']},
+                                color="success",
+                                outline=True,
+                                size="sm",
+                                className="w-100"
+                            )
+                        ], width=12)
+                    ])
                 ])
             ], className="mb-3", style={'cursor': 'pointer'})
             
@@ -2659,6 +2701,287 @@ def toggle_team_metrics_modal(open_clicks, close_clicks, is_open, unitid):
 
 # Register all Firebase authentication callbacks
 register_auth_callbacks(app)
+
+# ============================================================================
+# AI RECOMMENDATIONS CALLBACKS
+# ============================================================================
+
+@app.callback(
+    Output('recommendations-content', 'children'),
+    Input('generate-recommendations-btn', 'n_clicks'),
+    State('filter-state', 'data'),
+    State('saved-schools', 'data'),
+    State('user-session', 'data'),
+    prevent_initial_call=True
+)
+def generate_recommendations(n_clicks, filter_state, saved_schools, user_session):
+    """Generate AI-powered school recommendations"""
+    if not n_clicks:
+        return html.Div()
+    
+    if not ai_features_available:
+        return dbc.Alert([
+            html.I(className="fas fa-exclamation-triangle me-2"),
+            "AI features are not available. Please configure your OpenAI API key in the environment variables."
+        ], color="warning")
+    
+    try:
+        # Get filtered schools
+        filtered_df = filter_data_from_state(filter_state)
+        
+        if filtered_df.empty:
+            return dbc.Alert([
+                html.I(className="fas fa-info-circle me-2"),
+                "No schools match your current filters. Try adjusting your filters to see recommendations."
+            ], color="info")
+        
+        # Get user profile if logged in
+        user_profile = None
+        if user_session and user_session.get('user_id'):
+            from firebase_config import UserMetrics
+            profile_result = UserMetrics.get_user_profile(user_session['user_id'])
+            if profile_result.get('success'):
+                user_profile = profile_result.get('user_data')
+        
+        # Generate recommendations
+        result = recommendation_engine.generate_recommendations(
+            filtered_schools=filtered_df,
+            filter_state=filter_state,
+            saved_schools=saved_schools or [],
+            user_profile=user_profile,
+            num_recommendations=5
+        )
+        
+        if not result['success']:
+            return dbc.Alert([
+                html.I(className="fas fa-exclamation-circle me-2"),
+                f"Failed to generate recommendations: {result.get('error', 'Unknown error')}"
+            ], color="danger")
+        
+        recommendations = result['recommendations']
+        
+        if not recommendations:
+            return dbc.Alert([
+                html.I(className="fas fa-info-circle me-2"),
+                "No recommendations generated. This might be due to limited data or filter constraints."
+            ], color="info")
+        
+        # Create recommendation cards
+        from ai_components import create_recommendation_card
+        cards = [create_recommendation_card(rec) for rec in recommendations]
+        
+        return html.Div([
+            dbc.Alert([
+                html.I(className="fas fa-check-circle me-2"),
+                f"Generated {len(recommendations)} personalized recommendations based on your preferences!"
+            ], color="success", className="mb-3"),
+            html.Div(cards)
+        ])
+        
+    except Exception as e:
+        print(f"Error generating recommendations: {e}")
+        import traceback
+        traceback.print_exc()
+        return dbc.Alert([
+            html.I(className="fas fa-exclamation-circle me-2"),
+            f"An error occurred: {str(e)}"
+        ], color="danger")
+
+
+# Callback to open email generator modal
+@app.callback(
+    Output('email-generator-modal', 'is_open'),
+    Output('email-school-info', 'children'),
+    Output('current-school-unitid', 'data', allow_duplicate=True),
+    Input({'type': 'draft-email-btn', 'index': dash.ALL}, 'n_clicks'),
+    Input('close-email-modal', 'n_clicks'),
+    State('email-generator-modal', 'is_open'),
+    State('saved-schools', 'data'),
+    prevent_initial_call=True
+)
+def toggle_email_modal(draft_clicks, close_clicks, is_open, saved_schools):
+    """Open/close email generator modal"""
+    ctx = dash.callback_context
+    
+    if not ctx.triggered:
+        return is_open, html.Div(), None
+    
+    trigger_id = ctx.triggered[0]['prop_id']
+    
+    # Close modal
+    if 'close-email-modal' in trigger_id:
+        return False, html.Div(), None
+    
+    # Open modal for a specific school
+    if 'draft-email-btn' in trigger_id:
+        # Extract unitid from button index
+        trigger_dict = json.loads(trigger_id.split('.')[0])
+        unitid = trigger_dict['index']
+        
+        # Get school data
+        school = merged_data[merged_data['unitid'] == int(unitid)]
+        if school.empty:
+            return is_open, html.Div(), None
+        
+        school = school.iloc[0]
+        
+        # Create school info display
+        school_info = html.Div([
+            html.H5(school['instnm'], className="mb-2"),
+            html.P([
+                html.Strong("Division: "),
+                f"{school.get('division', 'N/A')} • ",
+                html.Strong("Conference: "),
+                f"{school.get('Conference_Name', 'N/A')}"
+            ], className="text-muted")
+        ])
+        
+        return True, school_info, unitid
+    
+    return is_open, html.Div(), None
+
+
+# Callback to generate email
+@app.callback(
+    Output('email-display-area', 'children'),
+    Input('generate-email-btn', 'n_clicks'),
+    State('current-school-unitid', 'data'),
+    State('email-type-select', 'value'),
+    State('email-tone-select', 'value'),
+    State('email-additional-info', 'value'),
+    State('user-session', 'data'),
+    prevent_initial_call=True
+)
+def generate_email(n_clicks, unitid, email_type, tone, additional_info, user_session):
+    """Generate email to coach"""
+    if not n_clicks or not unitid:
+        return html.Div()
+    
+    if not ai_features_available:
+        return dbc.Alert([
+            html.I(className="fas fa-exclamation-triangle me-2"),
+            "AI features are not available. Please configure your OpenAI API key."
+        ], color="warning")
+    
+    try:
+        # Get school data
+        school = merged_data[merged_data['unitid'] == int(unitid)]
+        if school.empty:
+            return dbc.Alert("School not found", color="danger")
+        
+        school = school.iloc[0]
+        school_data = {
+            'name': school.get('instnm'),
+            'division': school.get('division'),
+            'conference': school.get('Conference_Name'),
+            'city': school.get('city'),
+            'state': school.get('state')
+        }
+        
+        # Get user profile
+        user_profile = {
+            'name': 'Student Athlete',
+            'position': 'Player',
+            'graduation_year': '2025',
+            'high_school': 'High School'
+        }
+        
+        if user_session and user_session.get('user_id'):
+            from firebase_config import UserMetrics
+            profile_result = UserMetrics.get_user_profile(user_session['user_id'])
+            if profile_result.get('success'):
+                profile_data = profile_result.get('user_data', {})
+                user_profile.update({
+                    'name': profile_data.get('name', user_profile['name']),
+                    'athletic_metrics': profile_data.get('athletic_metrics', {}),
+                    'academic_info': profile_data.get('academic_info', {})
+                })
+        
+        # Generate email
+        if email_type == 'introduction':
+            result = email_generator.generate_introduction_email(
+                school_data=school_data,
+                user_profile=user_profile,
+                tone=tone,
+                additional_info=additional_info or ""
+            )
+        else:  # followup
+            result = email_generator.generate_followup_email(
+                school_data=school_data,
+                user_profile=user_profile,
+                previous_contact=additional_info,
+                tone=tone
+            )
+        
+        if not result['success']:
+            return dbc.Alert([
+                html.I(className="fas fa-exclamation-circle me-2"),
+                f"Failed to generate email: {result.get('error', 'Unknown error')}"
+            ], color="danger")
+        
+        # Display the generated email
+        from ai_components import create_email_display
+        return create_email_display(result['email'])
+        
+    except Exception as e:
+        print(f"Error generating email: {e}")
+        import traceback
+        traceback.print_exc()
+        return dbc.Alert([
+            html.I(className="fas fa-exclamation-circle me-2"),
+            f"An error occurred: {str(e)}"
+        ], color="danger")
+
+
+# Callback to copy email to clipboard
+@app.callback(
+    Output('copy-confirmation', 'children'),
+    Input('copy-email-btn', 'n_clicks'),
+    State('email-subject-edit', 'value'),
+    State('email-body-edit', 'value'),
+    prevent_initial_call=True
+)
+def copy_email_to_clipboard(n_clicks, subject, body):
+    """Show confirmation that email was copied"""
+    if not n_clicks:
+        return html.Div()
+    
+    # Note: Actual clipboard copy happens in browser via JavaScript
+    # This callback just shows confirmation
+    return dbc.Alert([
+        html.I(className="fas fa-check me-2"),
+        "Email copied to clipboard! You can now paste it into your email client."
+    ], color="success", dismissable=True, duration=4000, className="mt-2")
+
+
+# Callback to add recommended school to saved list
+@app.callback(
+    Output('saved-schools', 'data', allow_duplicate=True),
+    Input({'type': 'save-recommended-school', 'index': dash.ALL}, 'n_clicks'),
+    State('saved-schools', 'data'),
+    prevent_initial_call=True
+)
+def save_recommended_school(n_clicks_list, saved_schools):
+    """Add a recommended school to saved list"""
+    ctx = dash.callback_context
+    
+    if not ctx.triggered or not any(n_clicks_list):
+        raise dash.exceptions.PreventUpdate
+    
+    # Find which button was clicked
+    trigger_id = ctx.triggered[0]['prop_id']
+    if 'save-recommended-school' not in trigger_id:
+        raise dash.exceptions.PreventUpdate
+    
+    # Extract unitid
+    trigger_dict = json.loads(trigger_id.split('.')[0])
+    unitid = int(trigger_dict['index'])
+    
+    # Add to saved schools if not already saved
+    saved_set = set(saved_schools or [])
+    saved_set.add(unitid)
+    
+    return list(saved_set)
 
 # ============================================================================
 # RUN SERVER
