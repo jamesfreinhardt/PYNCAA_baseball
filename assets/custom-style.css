@@ -35,16 +35,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   padding: 20px;
 }
 
-/* Mobile-specific sidebar adjustments */
-@media (max-width: 768px) {
-  .sidebar {
-    height: auto !important;
-    min-height: auto;
-    max-height: none;
-    position: relative;
-  }
-}
-
 /* Sidebar headings and labels */
 .sidebar h4, 
 .sidebar h5,
@@ -296,22 +286,26 @@ a:hover {
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
 
-/* Mobile map improvements */
+/* --- Responsive Adjustments --- */
+
+/* Tablet and below (768px) - Consolidated media query */
 @media (max-width: 768px) {
+  /* Sidebar adjustments */
+  .sidebar {
+    padding: 15px;
+    height: auto !important;
+    min-height: auto;
+    max-height: none;
+    position: relative;
+  }
+  
+  /* Map container */
   .map-container {
     margin: 0 -15px; /* Full width on mobile */
     border-radius: 0;
   }
-}
-
-/* --- Responsive Adjustments --- */
-
-/* Tablet and below (768px) */
-@media (max-width: 768px) {
-  .sidebar {
-    padding: 15px;
-  }
   
+  /* Typography */
   h1 {
     font-size: 1.75rem;
   }
@@ -321,24 +315,29 @@ a:hover {
     padding: 0.5rem 0.75rem;
   }
   
-  /* Make cards more compact on mobile */
+  /* Cards */
   .card {
     margin-bottom: 1rem;
     padding: 1rem;
   }
   
-  /* Improve table scrolling */
+  /* Tables */
   .dash-table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   
-  /* Reduce map height on mobile */
+  /* Map */
   #baseball-map {
     height: 50vh !important;
   }
   
-  /* Stack buttons vertically on mobile */
+  .map-container {
+    margin: 0 -15px; /* Full width on mobile */
+    border-radius: 0;
+  }
+  
+  /* Buttons */
   .btn-group {
     flex-direction: column;
   }
@@ -348,19 +347,18 @@ a:hover {
     margin-bottom: 0.5rem;
   }
   
-  /* Better touch targets */
   .btn, button {
     min-height: 44px;
     padding: 0.5rem 1rem;
   }
   
-  /* Improve accordion spacing */
+  /* Accordion */
   .accordion-button {
     padding: 0.75rem;
     font-size: 1rem;
   }
   
-  /* Better form controls on mobile */
+  /* Form controls */
   input[type="text"],
   input[type="number"],
   .form-control {
@@ -368,12 +366,12 @@ a:hover {
     min-height: 44px;
   }
   
-  /* Optimize slider labels */
+  /* Slider labels */
   .rc-slider-mark-text {
     font-size: 0.75rem;
   }
   
-  /* Improve school counter visibility */
+  /* School counter */
   .school-counter {
     font-size: 1rem;
     padding: 8px 12px;
@@ -381,6 +379,16 @@ a:hover {
   
   .school-counter .count-number {
     font-size: 1.2rem;
+  }
+  
+  /* Scrolling */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  body, html {
+    overflow-x: hidden;
+    max-width: 100%;
   }
 }
 
@@ -473,23 +481,11 @@ a:hover {
   }
 }
 
-/* Landscape orientation adjustments */
+/* Landscape orientation adjustments (applies in addition to general tablet styles above) */
 @media (max-width: 768px) and (orientation: landscape) {
-  /* Reduce map height in landscape */
+  /* Adjust map height specifically for landscape - overrides the 50vh from general tablet styles */
   #baseball-map {
     height: 60vh !important;
   }
 }
 
-/* Ensure proper scrolling on mobile */
-@media (max-width: 768px) {
-  body {
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Prevent horizontal scroll on body */
-  body, html {
-    overflow-x: hidden;
-    max-width: 100%;
-  }
-}
