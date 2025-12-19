@@ -76,8 +76,10 @@ def create_login_modal():
     ], id="auth-modal", is_open=False, size="md")
 
 
-def create_user_menu(is_authenticated=False, user_email=None):
+def create_user_menu(is_authenticated=False, user_email=None, display_name=None):
     """Create user menu component for navbar"""
+    label_text = display_name or user_email or "Account"
+
     if not is_authenticated:
         return dbc.Button(
             [html.I(className="fas fa-user me-2"), "Sign In"],
@@ -89,10 +91,14 @@ def create_user_menu(is_authenticated=False, user_email=None):
     else:
         return dbc.DropdownMenu([
             dbc.DropdownMenuItem(
-                [html.I(className="fas fa-user me-2"), user_email or "User"],
+                [html.I(className="fas fa-user me-2"), label_text],
                 header=True
             ),
             dbc.DropdownMenuItem(divider=True),
+            dbc.DropdownMenuItem(
+                [html.I(className="fas fa-id-badge me-2"), "Profile"],
+                id="view-profile"
+            ),
             dbc.DropdownMenuItem(
                 [html.I(className="fas fa-heart me-2"), "Saved Schools"],
                 id="view-saved-schools"
@@ -110,7 +116,7 @@ def create_user_menu(is_authenticated=False, user_email=None):
                 [html.I(className="fas fa-sign-out-alt me-2"), "Sign Out"],
                 id="signout-button"
             )
-        ], label="Account", color="primary", size="sm")
+        ], label=label_text, color="primary", size="sm")
 
 
 def create_saved_schools_modal():

@@ -15,6 +15,7 @@ import json
 import requests
 import os
 from dotenv import load_dotenv
+import time
 
 # Firebase imports
 from auth_components import (
@@ -1101,43 +1102,50 @@ sidebar = dbc.Col([
 ], width=3, className='sidebar', style={'height': '100vh', 'overflowY': 'auto', 'padding': '20px'})
 
 # Main content area
+main_tabs = dbc.Tabs([
+    # Map Tab
+    dbc.Tab([
+        html.Div([
+            dcc.Graph(id='baseball-map', style={'height': '70vh'}, config={'doubleClick': False})
+        ], className='map-container'),
+        html.Div(id='map-school-info', className='mt-3')
+    ], label='Map', tab_id='tab-map'),
+    
+    # Filtered School List Tab
+    dbc.Tab([
+        dbc.Row([
+            dbc.Col([
+                dbc.Button('Add Selected Rows to Saved List', id='add-to-saved', color='primary', className='mb-2')
+            ], width=4),
+            dbc.Col([
+                dbc.Input(id='school-search', type='text', placeholder='Search schools by name...', className='mb-2')
+            ], width=8)
+        ]),
+        html.Hr(),
+        html.Div(id='filtered-table')
+    ], label='Filtered School List', tab_id='tab-filtered'),
+    
+    # Saved List Tab
+    dbc.Tab([
+        dbc.Button('Remove Selected Rows', id='remove-from-saved', color='danger', className='me-2'),
+        dbc.Button('Clear Entire Saved List', id='clear-saved', color='warning'),
+        html.Hr(),
+        html.Div(id='saved-table')
+    ], label='Saved List', tab_id='tab-saved'),
+    
+    # Roster Metrics Tab
+    dbc.Tab([
+        html.Div(id='roster-metrics')
+    ], label='Metrics', tab_id='tab-metrics'),
+
+    # Profile Tab
+    dbc.Tab([
+        html.Div(id='profile-page', className='p-3')
+    ], label='Profile', tab_id='tab-profile'),
+], id='main-tabs', active_tab='tab-map')
+
 main_content = dbc.Col([
-    dbc.Tabs([
-        # Map Tab
-        dbc.Tab([
-            html.Div([
-                dcc.Graph(id='baseball-map', style={'height': '85vh'})
-            ], className='map-container')
-        ], label='Map'),
-        
-        # Filtered School List Tab
-        dbc.Tab([
-            dbc.Row([
-                dbc.Col([
-                    dbc.Button('Add Selected Rows to Saved List', id='add-to-saved', color='primary', className='mb-2')
-                ], width=4),
-                dbc.Col([
-                    dbc.Input(id='school-search', type='text', placeholder='Search schools by name...', className='mb-2')
-                ], width=8)
-            ]),
-            html.Hr(),
-            html.Div(id='filtered-table')
-        ], label='Filtered School List'),
-        
-        # Saved List Tab
-        dbc.Tab([
-            dbc.Button('Remove Selected Rows', id='remove-from-saved', color='danger', className='me-2'),
-            dbc.Button('Clear Entire Saved List', id='clear-saved', color='warning'),
-            html.Hr(),
-            html.Div(id='saved-table')
-        ], label='Saved List'),
-        
-        # Roster Metrics Tab
-        dbc.Tab([
-            html.Div(id='roster-metrics')
-        ], label='Metrics'),
-        
-    ])
+    main_tabs
 ], width=9)
 
 # App layout
@@ -1152,6 +1160,8 @@ app.layout = dbc.Container([
     dcc.Store(id='filter-state', data={}),  # Store for all filter values
     dcc.Store(id='filtered-data-store', data=[]),  # Store filtered table data
     dcc.Store(id='current-school-unitid', data=None),  # Track current school for team metrics
+    dcc.Store(id='map-click-state', data={'last_unitid': None, 'last_time': 0}),  # Track map clicks for double-click
+    dcc.Store(id='map-selected-unitid', data=None),  # Track currently clicked unitid for add button
     
     # Modal for detailed metrics
     dbc.Modal([
@@ -1454,16 +1464,8 @@ def update_map(filter_state):
             3: '#7b1fa2'   # Purple for Division 3
         }
         
-        # Create hover text with rounded values
-        filtered['hover_text'] = (
-            '<b>' + filtered['inst_name'] + '</b><br>' +
-            'Record: ' + filtered['wins'].fillna(0).astype(int).astype(str) + '-' + 
-            filtered['losses'].fillna(0).astype(int).astype(str) + 
-            ' (' + filtered['win_pct'].fillna(0).round(0).astype(int).astype(str) + '%)<br>' +
-            'Conference: ' + filtered['Conference_Name'].fillna('N/A') + '<br>' +
-            'Accept Rate: ' + filtered['accept_rate_pct'].fillna(0).round(0).astype(int).astype(str) + '%<br>' +
-            'Enrollment: ' + filtered['ugds'].fillna(0).astype(int).astype(str)
-        )
+        # Create hover text with just school name
+        filtered['hover_text'] = '<b>' + filtered['inst_name'] + '</b>'
         
         # Map division to color
         filtered['marker_color'] = filtered['division'].map(division_colors).fillna('#1f77b4')
@@ -1475,18 +1477,23 @@ def update_map(filter_state):
             mode='markers',
             marker=dict(size=8, color=filtered['marker_color']),
             text=filtered['hover_text'],
-            hoverinfo='text',
-            hovertemplate='%{text}<extra></extra>'
+            hovertemplate='<b>%{text}</b><extra></extra>',
+            customdata=filtered[['unitid', 'inst_name']].values,
+            name='Schools',
+            hoverinfo='skip'
         ))
         
+        # Enable event+select click mode to ensure click events fire reliably
         fig.update_layout(
+            clickmode='event+select',
             map=dict(
                 style='open-street-map',
                 center=dict(lat=39.8283, lon=-98.5795),
                 zoom=3.5
             ),
             margin=dict(l=0, r=0, t=0, b=0),
-            height=800
+            height=800,
+            hoverlabel=dict(namelength=-1)
         )
         
         print(f"Successfully created map with {len(filtered)} schools")
@@ -1502,6 +1509,144 @@ def update_map(filter_state):
             mode='markers',
             marker=dict(size=0)
         ))
+
+# Handle map clicks: show info on single click, add to saved on double-click
+@app.callback(
+    Output('map-school-info', 'children'),
+    Output('saved-schools', 'data', allow_duplicate=True),
+    Output('map-click-state', 'data'),
+    Output('map-selected-unitid', 'data'),
+    Input('baseball-map', 'clickData'),
+    State('saved-schools', 'data'),
+    State('map-click-state', 'data'),
+    prevent_initial_call=True
+)
+def handle_map_click(clickData, saved_schools, click_state):
+    try:
+        if not clickData or not clickData.get('points'):
+            return dash.no_update, dash.no_update, click_state, dash.no_update
+        point = clickData['points'][0]
+        custom = point.get('customdata')
+        if custom is None or len(custom) == 0 or custom[0] is None:
+            return dash.no_update, dash.no_update, click_state, dash.no_update
+        unitid = int(float(custom[0]))
+        school_name = custom[1] if len(custom) > 1 else 'Unknown'
+
+        now = time.time()
+        state = click_state or {'last_unitid': None, 'last_time': 0}
+        last_unitid = state.get('last_unitid')
+        last_time = float(state.get('last_time', 0))
+
+        # Detect double-click: same unitid within 900ms
+        if last_unitid == unitid and (now - last_time) < 0.9:
+            updated = saved_schools[:] if saved_schools else []
+            if unitid not in updated:
+                updated.append(unitid)
+            # Show confirmation message and reset click state
+            info_card = dbc.Alert(
+                f"✓ {school_name} added to Saved List!",
+                color="success",
+                dismissable=True,
+                duration=3000
+            )
+            return info_card, updated, {'last_unitid': None, 'last_time': 0}, unitid
+        else:
+            # Single click: show school info
+            school_data = merged_data[merged_data['unitid'] == unitid].iloc[0] if unitid in merged_data['unitid'].values else None
+            if school_data is not None:
+                def safe_int(val):
+                    try:
+                        return int(float(val))
+                    except Exception:
+                        return None
+
+                def fmt_int(val, suffix=''):
+                    v = safe_int(val)
+                    return f"{v}{suffix}" if v is not None else "N/A"
+
+                div_val = safe_int(school_data.get('division'))
+                division_txt = f"D{div_val}" if div_val is not None else "N/A"
+                wins_txt = fmt_int(school_data.get('wins'))
+                losses_txt = fmt_int(school_data.get('losses'))
+                winpct_txt = fmt_int(school_data.get('win_pct'), suffix='%')
+                accept_txt = fmt_int(school_data.get('accept_rate_pct'), suffix='%')
+                enroll_txt = fmt_int(school_data.get('ugds'))
+                city = school_data.get('city', 'N/A')
+                state = school_data.get('state_abbr', '')
+
+                info_card = dbc.Card([
+                    dbc.CardHeader(html.H5(school_data.get('inst_name', 'Unknown'), className='mb-0')),
+                    dbc.CardBody([
+                        dbc.Row([
+                            dbc.Col([
+                                html.Strong('Division: '),
+                                html.Span(division_txt)
+                            ], width=3),
+                            dbc.Col([
+                                html.Strong('Record: '),
+                                html.Span(f"{wins_txt}-{losses_txt} ({winpct_txt})")
+                            ], width=3),
+                            dbc.Col([
+                                html.Strong('Conference: '),
+                                html.Span(school_data.get('Conference_Name', 'N/A'))
+                            ], width=6)
+                        ], className='mb-2'),
+                        dbc.Row([
+                            dbc.Col([
+                                html.Strong('Accept Rate: '),
+                                html.Span(accept_txt)
+                            ], width=4),
+                            dbc.Col([
+                                html.Strong('Enrollment: '),
+                                html.Span(f"{enroll_txt:,}" if isinstance(enroll_txt, int) else enroll_txt)
+                            ], width=4),
+                            dbc.Col([
+                                html.Strong('Location: '),
+                                html.Span(f"{city}, {state}" if state else city)
+                            ], width=4)
+                        ])
+                    ]),
+                    dbc.CardFooter([
+                        dbc.Button(
+                            "Add to Saved List",
+                            id='map-add-to-saved',
+                            color='primary',
+                            size='sm',
+                            n_clicks=0,
+                            className='me-2'
+                        ),
+                        html.Small('Single-click to view, button to save', className='text-muted')
+                    ])
+                ], className='border-primary')
+            else:
+                info_card = None
+            # Record first click
+            return info_card, dash.no_update, {'last_unitid': unitid, 'last_time': now}, unitid
+    except Exception as e:
+        print(f"Error handling map click: {e}")
+        import traceback
+        traceback.print_exc()
+        return dash.no_update, dash.no_update, click_state, dash.no_update
+
+# Add to saved via map info button
+@app.callback(
+    Output('saved-schools', 'data', allow_duplicate=True),
+    Input('map-add-to-saved', 'n_clicks'),
+    State('map-selected-unitid', 'data'),
+    State('saved-schools', 'data'),
+    prevent_initial_call=True
+)
+def add_map_selected_to_saved(n_clicks, unitid, saved_schools):
+    try:
+        if not n_clicks or unitid is None:
+            return dash.no_update
+        updated = saved_schools[:] if saved_schools else []
+        if unitid not in updated:
+            updated.append(unitid)
+        return updated
+    except Exception as e:
+        print(f"Error adding map selected to saved: {e}")
+        return dash.no_update
 
 # Update filtered school list table
 @app.callback(

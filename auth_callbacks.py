@@ -136,8 +136,121 @@ def register_auth_callbacks(app):
         if user_id:
             result = UserMetrics.get_user_profile(user_id)
             if result['success']:
-                return result['user_data']
+                raw = result['user_data']
+                safe = {}
+                for key, val in raw.items():
+                    try:
+                        json.dumps(val)
+                        safe[key] = val
+                    except TypeError:
+                        safe[key] = str(val)
+                return safe
         return None
+
+    # Render user menu with display name once signed in
+    @app.callback(
+        Output('user-menu-container', 'children'),
+        Input('user-session', 'data'),
+        Input('user-profile', 'data')
+    )
+    def render_user_menu(session_data, profile_data):
+        is_authenticated = bool(session_data)
+        email = session_data.get('email') if session_data else None
+        display_name = None
+        if profile_data:
+            display_name = profile_data.get('display_name') or profile_data.get('email')
+        return create_user_menu(is_authenticated, user_email=email, display_name=display_name)
+
+    # Navigate to profile tab from menu
+    @app.callback(
+        Output('main-tabs', 'active_tab'),
+        Input('view-profile', 'n_clicks'),
+        State('main-tabs', 'active_tab'),
+        prevent_initial_call=True
+    )
+    def go_to_profile(n_clicks, active_tab):
+        if not n_clicks:
+            raise PreventUpdate
+        return 'tab-profile'
+
+    # Render profile page content
+    @app.callback(
+        Output('profile-page', 'children'),
+        Input('user-session', 'data'),
+        Input('user-profile', 'data')
+    )
+    def render_profile_page(session_data, profile_data):
+        if not session_data:
+            return dbc.Alert([
+                html.I(className="fas fa-lock me-2"),
+                "Sign in to view your profile"
+            ], color="info")
+
+        if not profile_data:
+            return dbc.Spinner(color="primary")
+
+        def fmt_time(val):
+            try:
+                return val.strftime('%Y-%m-%d %H:%M UTC')
+            except Exception:
+                return str(val)
+
+        saved_schools = profile_data.get('saved_schools') or []
+
+        def json_safe(data):
+            try:
+                return json.dumps(data, indent=2, default=str)
+            except Exception:
+                return str(data)
+
+        return dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                        html.H4(profile_data.get('display_name', 'User'), className="mb-1"),
+                        html.P(profile_data.get('email', ''), className="text-muted"),
+                        html.Hr(),
+                        html.P([
+                            html.I(className="fas fa-calendar-plus me-2"),
+                            "Joined: ", fmt_time(profile_data.get('created_at'))
+                        ], className="mb-1"),
+                        html.P([
+                            html.I(className="fas fa-clock me-2"),
+                            "Last Login: ", fmt_time(profile_data.get('last_login'))
+                        ], className="mb-0")
+                    ])
+                ])
+            ], md=6),
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                        html.H6("Activity", className="mb-3"),
+                        dbc.Row([
+                            dbc.Col([
+                                html.Div([
+                                    html.H4(str(profile_data.get('search_count', 0)), className="text-primary mb-0"),
+                                    html.Small("Searches", className="text-muted")
+                                ], className="text-center")
+                            ], width=6),
+                            dbc.Col([
+                                html.Div([
+                                    html.H4(str(len(saved_schools))),
+                                    html.Small("Saved Schools", className="text-muted")
+                                ], className="text-center")
+                            ], width=6)
+                        ])
+                    ])
+                ])
+            ], md=6),
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                        html.H6("Preferences", className="mb-2"),
+                        html.Pre(json_safe(profile_data.get('preferences', {})))
+                    ])
+                ])
+            ], md=12)
+        ])
     
     
     # Save school to favorites
