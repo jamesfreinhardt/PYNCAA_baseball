@@ -291,6 +291,7 @@ a:hover {
     border-radius: 0;
   }
   
+  /* Map height - !important required to override Dash/Plotly inline styles */
   #baseball-map {
     height: 50vh !important;
   }
@@ -387,7 +388,7 @@ a:hover {
     padding: 0.4rem 0.5rem;
   }
   
-  /* Reduce map height further */
+  /* Reduce map height further - !important required to override Dash inline styles */
   #baseball-map {
     height: 40vh !important;
   }
@@ -454,7 +455,8 @@ a:hover {
 /* Landscape orientation adjustments */
 /* In landscape mode on tablets (but not small phones), increase map height
    from 50vh to 60vh to better utilize the horizontal space.
-   Phones in landscape (≤576px) will keep the 40vh from the mobile query */
+   Phones in landscape (≤576px) will keep the 40vh from the mobile query.
+   !important required to override Dash/Plotly inline styles */
 @media (min-width: 577px) and (max-width: 768px) and (orientation: landscape) {
   #baseball-map {
     height: 60vh !important;
