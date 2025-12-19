@@ -38,7 +38,10 @@ app = dash.Dash(
         dbc.themes.BOOTSTRAP,
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     ],
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
+    meta_tags=[
+        {"name": "viewport", "content": "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"}
+    ]
 )
 
 # Expose Flask server for Gunicorn
@@ -1102,7 +1105,7 @@ sidebar = dbc.Col([
         
     ], start_collapsed=True, active_item='location', always_open=False)
     
-], width=3, className='sidebar', style={'height': '100vh', 'overflowY': 'auto', 'padding': '20px'})
+], width={'size': 12, 'md': 3}, className='sidebar', style={'height': '100vh', 'overflowY': 'auto', 'padding': '20px'})
 
 # Main content area
 main_tabs = dbc.Tabs([
@@ -1118,11 +1121,11 @@ main_tabs = dbc.Tabs([
     dbc.Tab([
         dbc.Row([
             dbc.Col([
-                dbc.Button('Add Selected Rows to Saved List', id='add-to-saved', color='primary', className='mb-2')
-            ], width=4),
+                dbc.Button('Add Selected Rows to Saved List', id='add-to-saved', color='primary', className='mb-2 w-100')
+            ], width={'size': 12, 'md': 4}),
             dbc.Col([
                 dbc.Input(id='school-search', type='text', placeholder='Search schools by name...', className='mb-2')
-            ], width=8)
+            ], width={'size': 12, 'md': 8})
         ]),
         html.Hr(),
         html.Div(id='filtered-table')
@@ -1130,8 +1133,10 @@ main_tabs = dbc.Tabs([
     
     # Saved List Tab
     dbc.Tab([
-        dbc.Button('Remove Selected Rows', id='remove-from-saved', color='danger', className='me-2'),
-        dbc.Button('Clear Entire Saved List', id='clear-saved', color='warning'),
+        html.Div([
+            dbc.Button('Remove Selected Rows', id='remove-from-saved', color='danger', className='me-2 mb-2'),
+            dbc.Button('Clear Entire Saved List', id='clear-saved', color='warning', className='mb-2')
+        ], className='d-flex flex-wrap'),
         html.Hr(),
         html.Div(id='saved-table')
     ], label='Saved List', tab_id='tab-saved'),
@@ -1149,7 +1154,7 @@ main_tabs = dbc.Tabs([
 
 main_content = dbc.Col([
     main_tabs
-], width=9)
+], width={'size': 12, 'md': 9})
 
 # App layout
 print("Creating layout...")

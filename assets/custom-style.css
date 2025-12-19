@@ -35,6 +35,16 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   padding: 20px;
 }
 
+/* Mobile-specific sidebar adjustments */
+@media (max-width: 767.98px) {
+  .sidebar {
+    height: auto !important;
+    min-height: auto;
+    max-height: none;
+    position: relative;
+  }
+}
+
 /* Sidebar headings and labels */
 .sidebar h4, 
 .sidebar h5,
@@ -148,6 +158,18 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Improve table scrolling on mobile */
+@media (max-width: 768px) {
+  .dash-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .dash-table-container table {
+    min-width: 600px;
+  }
+}
+
 .dash-spreadsheet {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -232,6 +254,20 @@ a:hover {
   border-color: var(--digin-orange) !important;
 }
 
+/* Improve touch targets for checkboxes on mobile */
+@media (max-width: 768px) {
+  .form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+  
+  .form-check-label {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+}
+
 /* --- School Counter --- */
 .school-counter {
   font-family: 'Oswald', sans-serif;
@@ -272,7 +308,17 @@ a:hover {
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
 
+/* Mobile map improvements */
+@media (max-width: 768px) {
+  .map-container {
+    margin: 0 -15px; /* Full width on mobile */
+    border-radius: 0;
+  }
+}
+
 /* --- Responsive Adjustments --- */
+
+/* Tablet and below (768px) */
 @media (max-width: 768px) {
   .sidebar {
     padding: 15px;
@@ -283,6 +329,179 @@ a:hover {
   }
   
   .nav-tabs .nav-link {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  /* Make cards more compact on mobile */
+  .card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+  
+  /* Improve table scrolling */
+  .dash-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Reduce map height on mobile */
+  #baseball-map {
+    height: 50vh !important;
+  }
+  
+  /* Stack buttons vertically on mobile */
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Better touch targets */
+  .btn, button {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+  }
+  
+  /* Improve accordion spacing */
+  .accordion-button {
+    padding: 0.75rem;
     font-size: 1rem;
+  }
+  
+  /* Better form controls on mobile */
+  input[type="text"],
+  input[type="number"],
+  .form-control {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+  
+  /* Optimize slider labels */
+  .rc-slider-mark-text {
+    font-size: 0.75rem;
+  }
+  
+  /* Improve school counter visibility */
+  .school-counter {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+  
+  .school-counter .count-number {
+    font-size: 1.2rem;
+  }
+}
+
+/* Mobile devices (576px and below) */
+@media (max-width: 576px) {
+  /* Further reduce heading sizes */
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2, .h2 {
+    font-size: 1.3rem;
+  }
+  
+  h3, .h3 {
+    font-size: 1.15rem;
+  }
+  
+  h4, .h4 {
+    font-size: 1rem;
+  }
+  
+  /* Compact navigation tabs */
+  .nav-tabs .nav-link {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem;
+  }
+  
+  /* Reduce map height further */
+  #baseball-map {
+    height: 40vh !important;
+  }
+  
+  /* Compact sidebar */
+  .sidebar {
+    padding: 10px;
+  }
+  
+  /* Smaller badges */
+  .badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  
+  /* Compact cards */
+  .card {
+    padding: 0.75rem;
+  }
+  
+  .card h4 {
+    font-size: 1rem;
+  }
+  
+  .card h5 {
+    font-size: 0.9rem;
+  }
+  
+  /* Better modal sizing */
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  /* Improve table on small screens */
+  .dash-spreadsheet {
+    font-size: 0.85rem;
+  }
+  
+  /* Compact accordion */
+  .accordion-button {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .accordion-body {
+    padding: 0.75rem;
+  }
+  
+  /* Smaller slider marks */
+  .rc-slider-mark-text {
+    font-size: 0.7rem;
+  }
+  
+  /* Optimize dropdown for mobile */
+  .Select-menu-outer {
+    max-height: 200px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Reduce map height in landscape */
+  #baseball-map {
+    height: 60vh !important;
+  }
+}
+
+/* Ensure proper scrolling on mobile */
+@media (max-width: 768px) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent horizontal scroll on body */
+  body, html {
+    overflow-x: hidden;
+    max-width: 100%;
   }
 }
