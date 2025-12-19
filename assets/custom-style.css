@@ -36,7 +36,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 /* Mobile-specific sidebar adjustments */
-@media (max-width: 767.98px) {
+@media (max-width: 768px) {
   .sidebar {
     height: auto !important;
     min-height: auto;
@@ -156,18 +156,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Improve table scrolling on mobile */
-@media (max-width: 768px) {
-  .dash-table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .dash-table-container table {
-    min-width: 600px;
-  }
 }
 
 .dash-spreadsheet {
