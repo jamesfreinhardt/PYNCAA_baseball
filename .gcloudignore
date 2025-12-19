@@ -1,0 +1,20 @@
+# Ignore virtual environments
+.venv/
+.venv-1/
+venv/
+__pycache__/
+
+# Ignore git
+.git/
+.github/
+
+# Ignore development files
+.env
+firebase-debug.log
+.firebaserc
+firebase.json
+*.pyc
+.DS_Store
+
+# Ignore node modules (if any)
+node_modules/

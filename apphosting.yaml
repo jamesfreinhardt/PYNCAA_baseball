@@ -6,9 +6,12 @@ runConfig:
   concurrency: 80
   cpu: 1
   memoryMiB: 512
-  env:
-    - name: PORT
-      value: "8080"
+
+env:
+  - variable: PORT
+    value: "8080"
+    availability:
+      - RUNTIME
 
 # Environment variables and secrets.
 # env:
