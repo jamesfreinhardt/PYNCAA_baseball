@@ -31,15 +31,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 firebase_web_config = {
-    "apiKey": os.getenv("FIREBASE_API_KEY", ""),
-    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN", ""),
-    "projectId": os.getenv("FIREBASE_PROJECT_ID", ""),
-    "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET", ""),
-    "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID", ""),
-    "appId": os.getenv("FIREBASE_APP_ID", ""),
-    "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID", ""),
+    "apiKey": os.getenv("FIREBASE_API_KEY"),
+    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
+    "projectId": os.getenv("FIREBASE_PROJECT_ID"),
+    "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET"),
+    "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID"),
+    "appId": os.getenv("FIREBASE_APP_ID"),
+    "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID"),
     "databaseURL": ""
 }
+
+# Validate Firebase configuration
+required_firebase_keys = ["apiKey", "authDomain", "projectId", "storageBucket", "appId"]
+missing_keys = [key for key in required_firebase_keys if not firebase_web_config.get(key)]
+
+if missing_keys:
+    print(f"Warning: Missing Firebase configuration keys: {', '.join(missing_keys)}")
+    print("Please ensure your .env file contains all required FIREBASE_* environment variables.")
 ```
 
 ### 2. Updated Environment Configuration
