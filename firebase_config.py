@@ -10,15 +10,20 @@ import os
 from datetime import datetime
 import json
 
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
+
 # Firebase Web SDK configuration (for Pyrebase - client-side auth)
+# Configuration loaded from environment variables for security
 firebase_web_config = {
-    "apiKey": "AIzaSyDD6l5a3hFFcWpmI3M2_rzUIHiUB8XR_60",
-    "authDomain": "ncaabaseball-ebe8b.firebaseapp.com",
-    "projectId": "ncaabaseball-ebe8b",
-    "storageBucket": "ncaabaseball-ebe8b.firebasestorage.app",
-    "messagingSenderId": "953871692538",
-    "appId": "1:953871692538:web:249397a1ee500762f00f43",
-    "measurementId": "G-SGH5BRV0Q4",
+    "apiKey": os.getenv("FIREBASE_API_KEY", ""),
+    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN", ""),
+    "projectId": os.getenv("FIREBASE_PROJECT_ID", ""),
+    "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET", ""),
+    "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID", ""),
+    "appId": os.getenv("FIREBASE_APP_ID", ""),
+    "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID", ""),
     "databaseURL": ""  # Not using Realtime Database
 }
 

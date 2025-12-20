@@ -3,15 +3,41 @@
 ## Overview
 This app now includes Firebase authentication and Firestore database integration for user management and metrics tracking.
 
-## Firebase Configuration Already Done ✅
-The Firebase web configuration has been added to `firebase_config._60
-- Project: ncaabaseball-ebe8b
-- Authentication and Firestore are configured
+## Firebase Configuration
+
+The Firebase web configuration is loaded from environment variables for security.
+You need to configure your Firebase project credentials in a `.env` file.
 
 ## Setup Steps
 
-### 1. Enable Firebase Services in Console
-Visit: https://console.firebase.google.com/project/ncaabaseball-ebe8b
+### 1. Create `.env` File
+Copy `.env.example` to `.env` and fill in your Firebase project credentials:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your Firebase configuration values (get these from your Firebase Console):
+```
+FIREBASE_API_KEY=your_firebase_api_key_here
+FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+FIREBASE_APP_ID=your_app_id
+FIREBASE_MEASUREMENT_ID=your_measurement_id
+```
+
+**To get these values:**
+1. Go to Firebase Console: https://console.firebase.google.com
+2. Select your project (or create a new one)
+3. Go to Project Settings (⚙️ icon)
+4. Scroll to "Your apps" section
+5. If you haven't added a web app, click "Add app" and select Web
+6. Copy the config values from the Firebase SDK snippet
+
+### 2. Enable Firebase Services in Console
+Visit your Firebase Console: https://console.firebase.google.com
 
 1. **Enable Authentication**
    - Go to Authentication > Sign-in method
@@ -42,14 +68,14 @@ Visit: https://console.firebase.google.com/project/ncaabaseball-ebe8b
    }
    ```
 
-### 2. Download Service Account Key (Optional - for admin features)
+### 3. Download Service Account Key (Optional - for admin features)
 
 1. Go to Project Settings > Service Accounts
 2. Click "Generate new private key"
 3. Save the JSON file as `firebase-service-account.json` in the project root
-4. **IMPORTANT**: Add this file to `.gitignore` (already done)
+4. **IMPORTANT**: This file is already in `.gitignore` and should never be committed to version control
 
-### 3. Install Dependencies
+### 4. Install Dependencies
 Already done! The following packages are installed:
 ```bash
 pip install pyrebase4 firebase-admin
@@ -164,13 +190,15 @@ analytics = UserMetrics.get_user_analytics(user_id)
 
 ⚠️ **Important Security Considerations**:
 
-1. **API Keys in Code**: The Firebase web config API key in `firebase_config.py` is safe to expose in client-side code (it's not a secret). Firebase security is enforced through Firestore rules.
+1. **Environment Variables**: Firebase configuration is now loaded from environment variables stored in `.env` file. This file is git-ignored and should never be committed to version control.
 
-2. **Service Account Key**: The `firebase-service-account.json` file (if you download it) contains sensitive credentials. Never commit it to git!
+2. **API Keys**: While the Firebase web config API key can be used in client-side code, it's best practice to keep it in environment variables to avoid exposing it publicly on GitHub.
 
-3. **Firestore Rules**: Always set proper security rules in production. The test mode rules allow all reads/writes!
+3. **Service Account Key**: The `firebase-service-account.json` file (if you download it) contains sensitive credentials and should NEVER be committed to git. This file is already in `.gitignore`.
 
-4. **Password Security**: Firebase handles password hashing and security automatically.
+4. **Firestore Rules**: Always set proper security rules in production. The test mode rules allow all reads/writes!
+
+5. **Password Security**: Firebase handles password hashing and security automatically.
 
 ## Testing
 
@@ -198,16 +226,18 @@ To test the authentication:
 
 ### Authentication errors
 - Verify Email/Password is enabled in Firebase Console
-- Check that the Firebase config in `firebase_config.py` matches your project
+- Check that your `.env` file has the correct Firebase configuration
+- Ensure all required environment variables are set
 
 ## Next Steps
 
-1. ✅ Enable Authentication in Firebase Console
-2. ✅ Enable Firestore Database
-3. ✅ Set Firestore security rules
-4. Optional: Download service account key for admin features
-5. Test the authentication flow
-6. Customize user metrics tracking as needed
+1. ✅ Create `.env` file with your Firebase configuration
+2. ✅ Enable Authentication in Firebase Console
+3. ✅ Enable Firestore Database
+4. ✅ Set Firestore security rules
+5. Optional: Download service account key for admin features
+6. Test the authentication flow
+7. Customize user metrics tracking as needed
 
 ## Support
 
