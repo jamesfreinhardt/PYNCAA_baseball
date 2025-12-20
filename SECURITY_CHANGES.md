@@ -181,5 +181,5 @@ For questions about these security changes, please contact the repository mainta
 
 **Date**: 2025-12-20
 **Status**: ✅ Completed
-**Severity**: Medium (credentials exposed but limited scope)
+**Severity**: High (API credentials exposed in public repository)
 **Resolution**: Credentials moved to environment variables
