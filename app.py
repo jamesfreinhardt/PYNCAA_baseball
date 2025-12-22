@@ -2045,97 +2045,60 @@ def toggle_metrics_modal(n_clicks, is_open):
                     html.P(f"{school.get('city', '')}, {school.get('state_abbr', '')}", className="text-muted mb-3"),
                     # School Info Badges (like College Scorecard)
                     html.Div([
-                        # Years (based on highest degree - using 4-year as default for colleges)
+                        # Year (fixed 4-year icon)
                         html.Div([
-                            html.Div([
-                                html.Img(src="https://collegescorecard.ed.gov/school-icons/four.svg", 
-                                        style={'width': '30px', 'height': '30px'})
-                            ], style={
-                                'width': '50px',
-                                'height': '50px',
-                                'borderRadius': '50%',
-                                'backgroundColor': '#e8eaf6',
-                                'display': 'flex',
-                                'alignItems': 'center',
-                                'justifyContent': 'center',
-                                'marginBottom': '8px'
-                            }),
-                            html.Div("Year", style={'fontWeight': '500', 'fontSize': '14px', 'textAlign': 'center'})
-                        ], style={'display': 'inline-block', 'marginRight': '30px', 'verticalAlign': 'top'}),
-                        
+                            html.Div([html.Img(src="https://collegescorecard.ed.gov/school-icons/four.svg")], className='icon'),
+                            html.Div("Year", className='scorecard-label')
+                        ], className='scorecard-badge'),
+
                         # Control/Ownership
                         html.Div([
-                            html.Div([
-                                html.Img(src="https://collegescorecard.ed.gov/school-icons/public.svg" if school.get('control') == 1.0 
-                                        else "https://collegescorecard.ed.gov/school-icons/private.svg",
-                                        style={'width': '30px', 'height': '30px'})
-                            ], style={
-                                'width': '50px',
-                                'height': '50px',
-                                'borderRadius': '50%',
-                                'backgroundColor': '#e8eaf6',
-                                'display': 'flex',
-                                'alignItems': 'center',
-                                'justifyContent': 'center',
-                                'marginBottom': '8px'
-                            }),
+                            html.Div([html.Img(src=("https://collegescorecard.ed.gov/school-icons/public.svg" if school.get('control') == 1.0 
+                                                     else "https://collegescorecard.ed.gov/school-icons/private.svg"))], className='icon'),
                             html.Div(
                                 "Public" if school.get('control') == 1.0 else ("Private Nonprofit" if school.get('control') == 2.0 else "Private For-Profit"),
-                                style={'fontWeight': '500', 'fontSize': '14px', 'textAlign': 'center', 'maxWidth': '100px'}
+                                className='scorecard-label'
                             )
-                        ], style={'display': 'inline-block', 'marginRight': '30px', 'verticalAlign': 'top'}),
-                        
+                        ], className='scorecard-badge'),
+
                         # Locale (City/Town/Rural)
                         html.Div([
                             html.Div([
-                                html.Img(src="https://collegescorecard.ed.gov/school-icons/city.svg" if school.get('locale', 0) >= 11 and school.get('locale', 0) <= 13 
-                                        else ("https://collegescorecard.ed.gov/school-icons/suburban.svg" if school.get('locale', 0) >= 21 and school.get('locale', 0) <= 23
-                                        else ("https://collegescorecard.ed.gov/school-icons/town.svg" if school.get('locale', 0) >= 31 and school.get('locale', 0) <= 33
-                                        else "https://collegescorecard.ed.gov/school-icons/rural.svg")),
-                                        style={'width': '30px', 'height': '30px'})
-                            ], style={
-                                'width': '50px',
-                                'height': '50px',
-                                'borderRadius': '50%',
-                                'backgroundColor': '#e8eaf6',
-                                'display': 'flex',
-                                'alignItems': 'center',
-                                'justifyContent': 'center',
-                                'marginBottom': '8px'
-                            }),
+                                html.Img(src=(
+                                    "https://collegescorecard.ed.gov/school-icons/city.svg" if 11 <= school.get('locale', 0) <= 13 else (
+                                        "https://collegescorecard.ed.gov/school-icons/suburban.svg" if 21 <= school.get('locale', 0) <= 23 else (
+                                            "https://collegescorecard.ed.gov/school-icons/town.svg" if 31 <= school.get('locale', 0) <= 33 else
+                                            "https://collegescorecard.ed.gov/school-icons/rural.svg"
+                                        )
+                                    )
+                                ))
+                            ], className='icon'),
                             html.Div(
-                                "City" if school.get('locale', 0) >= 11 and school.get('locale', 0) <= 13 
-                                else ("Suburb" if school.get('locale', 0) >= 21 and school.get('locale', 0) <= 23
-                                else ("Town" if school.get('locale', 0) >= 31 and school.get('locale', 0) <= 33
-                                else "Rural")),
-                                style={'fontWeight': '500', 'fontSize': '14px', 'textAlign': 'center'}
+                                "City" if 11 <= school.get('locale', 0) <= 13 else (
+                                    "Suburb" if 21 <= school.get('locale', 0) <= 23 else (
+                                        "Town" if 31 <= school.get('locale', 0) <= 33 else "Rural"
+                                    )
+                                ),
+                                className='scorecard-label'
                             )
-                        ], style={'display': 'inline-block', 'marginRight': '30px', 'verticalAlign': 'top'}),
-                        
+                        ], className='scorecard-badge'),
+
                         # Size
                         html.Div([
                             html.Div([
-                                html.Img(src="https://collegescorecard.ed.gov/school-icons/small.svg" if school.get('ugds', 0) < 2000 
-                                        else ("https://collegescorecard.ed.gov/school-icons/medium.svg" if school.get('ugds', 0) < 15000 
-                                        else "https://collegescorecard.ed.gov/school-icons/large.svg"),
-                                        style={'width': '30px', 'height': '30px'})
-                            ], style={
-                                'width': '50px',
-                                'height': '50px',
-                                'borderRadius': '50%',
-                                'backgroundColor': '#e8eaf6',
-                                'display': 'flex',
-                                'alignItems': 'center',
-                                'justifyContent': 'center',
-                                'marginBottom': '8px'
-                            }),
+                                html.Img(src=(
+                                    "https://collegescorecard.ed.gov/school-icons/small.svg" if school.get('ugds', 0) < 2000 else (
+                                        "https://collegescorecard.ed.gov/school-icons/medium.svg" if school.get('ugds', 0) < 15000 else
+                                        "https://collegescorecard.ed.gov/school-icons/large.svg"
+                                    )
+                                ))
+                            ], className='icon'),
                             html.Div(
-                                "Small" if school.get('ugds', 0) < 2000 
-                                else ("Medium" if school.get('ugds', 0) < 15000 else "Large"),
-                                style={'fontWeight': '500', 'fontSize': '14px', 'textAlign': 'center'}
+                                "Small" if school.get('ugds', 0) < 2000 else ("Medium" if school.get('ugds', 0) < 15000 else "Large"),
+                                className='scorecard-label'
                             )
-                        ], style={'display': 'inline-block', 'marginRight': '30px', 'verticalAlign': 'top'}),
-                    ], className="mb-4")
+                        ], className='scorecard-badge'),
+                    ], className="scorecard-badges mb-4")
                 ], width=9),
                 dbc.Col([
                     html.Div([

@@ -286,3 +286,41 @@ a:hover {
     font-size: 1rem;
   }
 }
+
+/* --- School Info Scorecard Badges --- */
+.scorecard-badges {
+  display: flex;
+  align-items: flex-start;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+
+.scorecard-badge {
+  width: 120px;
+  text-align: center;
+}
+
+.scorecard-badge .icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #e8eaf6; /* light circle background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; /* center the icon circle */
+}
+
+.scorecard-badge .icon img {
+  width: 30px;
+  height: 30px;
+}
+
+.scorecard-badge .scorecard-label {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  margin-top: 6px;
+  color: var(--digin-blue);
+  background: transparent; /* prevent accidental badge-like styling */
+}
