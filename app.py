@@ -1109,7 +1109,12 @@ main_tabs = dbc.Tabs([
     # Map Tab
     dbc.Tab([
         html.Div([
-            dcc.Graph(id='baseball-map', style={'height': '70vh'}, config={'doubleClick': False})
+            dcc.Graph(
+                id='baseball-map',
+                className='responsive-map',
+                style={'height': '100%'},
+                config={'doubleClick': False, 'responsive': True}
+            )
         ], className='map-container'),
         html.Div(id='map-school-info', className='mt-3')
     ], label='Map', tab_id='tab-map'),

@@ -187,16 +187,50 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /* --- Dropdown Styling --- */
 .Select-control {
   border-color: #ced4da !important;
+  background-color: #ffffff !important;
 }
 
 .Select-menu-outer {
   border-color: #ced4da !important;
+  background-color: #ffffff !important;
 }
 
 .Select--multi .Select-value {
   background-color: var(--digin-orange) !important;
   border-color: var(--digin-orange) !important;
   color: #ffffff !important;
+}
+
+/* Sidebar dropdown fixes for visibility */
+.sidebar .Select-control,
+.sidebar select,
+.sidebar .form-select {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ced4da !important;
+}
+
+.sidebar .Select-placeholder,
+.sidebar .Select-value-label {
+  color: #000000 !important;
+}
+
+.sidebar .Select-input input {
+  color: #000000 !important;
+}
+
+.sidebar .Select-menu-outer {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.sidebar .Select-option {
+  color: #000000 !important;
+}
+
+.sidebar .Select-option:hover,
+.sidebar .Select-option.is-focused {
+  background-color: rgba(245, 128, 37, 0.1) !important;
 }
 
 /* --- Input Fields --- */
@@ -206,6 +240,8 @@ input[type="number"],
   border: 1px solid #ced4da;
   border-radius: 4px;
   padding: 6px 12px;
+  background-color: #ffffff;
+  color: #000000;
 }
 
 input[type="text"]:focus,
@@ -213,6 +249,14 @@ input[type="number"]:focus,
 .form-control:focus {
   border-color: var(--digin-orange);
   box-shadow: 0 0 0 0.2rem rgba(245, 128, 37, 0.25);
+}
+
+/* Ensure sidebar inputs have proper contrast */
+.sidebar input[type="text"],
+.sidebar input[type="number"],
+.sidebar .form-control {
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 /* --- Links --- */
@@ -270,6 +314,27 @@ a:hover {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  height: 70vh; /* default desktop height */
+}
+
+/* Make the Plotly graph fill the container height */
+.map-container .dash-graph,
+#baseball-map {
+  height: 100% !important;
+}
+
+/* Tablet breakpoint */
+@media (max-width: 992px) {
+  .map-container {
+    height: 60vh;
+  }
+}
+
+/* Mobile breakpoint */
+@media (max-width: 576px) {
+  .map-container {
+    height: 50vh;
+  }
 }
 
 /* --- Responsive Adjustments --- */
@@ -284,6 +349,37 @@ a:hover {
   
   .nav-tabs .nav-link {
     font-size: 1rem;
+  }
+  
+  /* Improve mobile dropdown usability */
+  .sidebar select,
+  .sidebar .form-select,
+  .sidebar .Select-control {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 10px !important;
+  }
+  
+  /* Stack scorecard badges vertically on mobile */
+  .scorecard-badges {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .scorecard-badge {
+    width: 100px;
+  }
+  
+  /* Improve table scrolling on mobile */
+  .dash-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better button sizing on mobile */
+  .btn {
+    padding: 10px 16px;
+    font-size: 14px;
   }
 }
 
